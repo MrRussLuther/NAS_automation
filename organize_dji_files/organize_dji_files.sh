@@ -63,4 +63,3 @@ else
 fi
 
 log "INFO" "Organizing files complete."
-echo "Log file is located at: $LOG_FILE"
