@@ -7,7 +7,11 @@ NOW=$(date +%Y-%m-%d-%H-%M-%S)
 log() {
     local level=$1
     local message=$2
-    echo "$(date +%Y-%m-%d-%H-%M-%S) - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
+    if [ "$level" = "ERROR" ]; then
+        echo "$(date +%Y-%m-%d-%H-%M-%S) - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
+    else
+        echo "$(date +%Y-%m-%d-%H-%M-%S) - ${level} - ${message}" | tee -a ${LOG_FILE}
+    fi
 }
 
 # Ensure dataset is provided as an argument
@@ -132,7 +136,7 @@ if [ "$snapshot_taken" = false ]; then
     create_snapshot "hourly"
 fi
 
-# Hourly Snapshots: Keep snapshots every 1 hour for 1 day
+# Hourly Snapshots: Keep hourly snapshots for 1 day
 cleanup_snapshots "${DATASET}" "hourly" 24
 
 # Daily Snapshots: Keep daily snapshots for 2 weeks
