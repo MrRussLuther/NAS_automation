@@ -3,17 +3,6 @@
 # Get current date and time
 NOW=$(date +%Y-%m-%d-%H-%M-%S)
 
-# Function to log messages
-log() {
-    local level=$1
-    local message=$2
-    if [ "$level" = "ERROR" ]; then
-        echo "$(date +%Y-%m-%d-%H-%M-%S) - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
-    elif [ "$level" = "INFO" ]; then
-        echo "$timestamp - ${level} - ${message}" >> ${LOG_FILE}
-    fi
-}
-
 # Ensure dataset is provided as an argument
 if [ -z "$1" ]; then
     echo "Usage: $0 <dataset>"
@@ -33,12 +22,24 @@ PARENT_OWNER=$(stat -c '%u:%g' "${PARENT_DIR}")
 mkdir -p "${LOG_DIR}"
 chown "${PARENT_OWNER}" "${LOG_DIR}"
 
-LOGFILE="${LOG_DIR}/$(basename "${DATASET}").log"
+LOG_FILE="${LOG_DIR}/$(basename "${DATASET}").log"
 LOCKFILE="${SCRIPT_DIR}/$(basename "${DATASET}").lock"
 
 # Create log and lock files with the same ownership as the parent directory
-touch "${LOGFILE}" "${LOCKFILE}"
-chown "${PARENT_OWNER}" "${LOGFILE}" "${LOCKFILE}"
+touch "${LOG_FILE}" "${LOCKFILE}"
+chown "${PARENT_OWNER}" "${LOG_FILE}" "${LOCKFILE}"
+
+# Function to log messages
+log() {
+    local level=$1
+    local message=$2
+    local timestamp=$(date +%Y-%m-%d-%H-%M-%S)
+    if [ "$level" = "ERROR" ]; then
+        echo "$timestamp - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
+    elif [ "$level" = "INFO" ]; then
+        echo "$timestamp - ${level} - ${message}" >> ${LOG_FILE}
+    fi
+}
 
 # Log start of the script
 log "INFO" "Script started for dataset ${DATASET}"
@@ -90,7 +91,6 @@ if [ -e "${LOCKFILE}" ]; then
         exit 1
     fi
 fi
-
 
 # Create a lock file
 trap 'rm -f "${LOCKFILE}"; exit' INT TERM EXIT
