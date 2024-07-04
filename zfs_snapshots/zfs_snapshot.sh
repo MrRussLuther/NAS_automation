@@ -72,6 +72,7 @@ cleanup_snapshots() {
             log "INFO" "Snapshot Names: $(echo "$to_delete" | tr '\n' ' ')"
         else
             log "ERROR" "Failed to delete some ${tag} snapshots for ${dataset}"
+            log "ERROR" "Snapshot Names: $(echo "$to_delete" | tr '\n' ' ')"
         fi
     fi
 }
@@ -126,13 +127,13 @@ if [ "$current_month" -eq 1 ] && [ "$current_day" -eq 1 ] && [ "$current_hour" -
     snapshot_taken=true
 fi
 
-# Create a frequent snapshot every time the script runs if no other snapshot is taken
+# Create a hourly snapshot every time the script runs if no other snapshot is taken
 if [ "$snapshot_taken" = false ]; then
-    create_snapshot "frequent"
+    create_snapshot "hourly"
 fi
 
-# Frequent Snapshots: Keep snapshots every 1 hour for 1 day
-cleanup_snapshots "${DATASET}" "frequent" 24
+# Hourly Snapshots: Keep snapshots every 1 hour for 1 day
+cleanup_snapshots "${DATASET}" "hourly" 24
 
 # Daily Snapshots: Keep daily snapshots for 2 weeks
 cleanup_snapshots "${DATASET}" "daily" 14
