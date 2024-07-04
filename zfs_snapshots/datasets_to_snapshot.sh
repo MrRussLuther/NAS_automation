@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Snapshot test dataset
-bash /mnt/RussNAS/scripts/zfs_snapshots/zfs_snapshot.sh RussNAS/test
+bash /mnt/RussNAS/scripts/zfs_snapshots/manage_snapshots.sh RussNAS/test
 
 # Sanpshot WindowsComputer dataset
-bash /mnt/RussNAS/scripts/zfs_snapshots/zfs_snapshot.sh RussNAS/WindowsComputer
+bash /mnt/RussNAS/scripts/zfs_snapshots/manage_snapshots.sh RussNAS/WindowsComputer
 
 # Sanpshot plex-media dataset
-bash /mnt/RussNAS/scripts/zfs_snapshots/zfs_snapshot.sh RussNAS/plex/plex-media
+bash /mnt/RussNAS/scripts/zfs_snapshots/manage_snapshots.sh RussNAS/plex/plex-media
