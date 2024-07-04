@@ -3,6 +3,9 @@
 # Exit on error, undefined variable, or pipe failure
 set -euo pipefail
 
+# Get current date and time
+NOW=$(date +%Y-%m-%d-%H-%M-%S)
+
 # Specify the directory containing the files
 FILES_DIR="/mnt/RussNAS/plex/plex-media/Library/Drone Videos/To Process"
 
@@ -12,25 +15,22 @@ SCRIPT_DIR=$(dirname "$0")
 # Set the log file location in the script's directory
 LOG_FILE="${SCRIPT_DIR}/organize_dji_files.log"
 
+# Function to log messages
 log() {
-    local message="$1"
-    local log_type="${2:-}"
-    if [ "$log_type" == "error" ]; then
-        echo "$(date) - ERROR: $message" >> "$LOG_FILE"
-    else
-        echo "$(date) - $message" >> "$LOG_FILE"
-    fi
+    local level=$1
+    local message=$2
+    echo "$(date +%Y-%m-%d-%H-%M-%S) - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
 }
 
 # Ensure the directory exists
 if [ ! -d "$FILES_DIR" ]; then
-    log "Directory $FILES_DIR does not exist. Exiting." "error"
+    log "ERROR" "Directory $FILES_DIR does not exist. Exiting." 
     exit 1
 fi
 
 # Check if there are any files to process
 if [ "$(find "$FILES_DIR" -type f | wc -l)" -eq 0 ]; then
-    log "No files to process in $FILES_DIR."
+    log "INFO" "No files to process in $FILES_DIR."
 else
     find "$FILES_DIR" -type f | while read -r file; do
         filename=$(basename -- "$file")
@@ -44,23 +44,23 @@ else
             
             # Create directory structure if it doesn't exist, and log any errors
             if mkdir -p "$target_dir"; then
-                log "Created directory $target_dir"
+                log "INFO" "Created directory $target_dir"
             else
-                log "Failed to create directory $target_dir" "error"
+                log "ERROR" "Failed to create directory $target_dir"
                 continue
             fi
 
             # Move the file to the appropriate directory, and log any errors
             if mv "$file" "$target_dir/"; then
-                log "Moved $filename to $target_dir/"
+                log "INFO" "Moved $filename to $target_dir/"
             else
-                log "Failed to move $filename to $target_dir/" "error"
+                log "ERROR" "Failed to move $filename to $target_dir/" 
             fi
         else
-            log "Skipping $filename - not in expected format." "error"
+            log "ERROR" "Skipping $filename - not in expected format."
         fi
     done
 fi
 
-log "Organizing files complete."
+log "INFO" "Organizing files complete."
 echo "Log file is located at: $LOG_FILE"

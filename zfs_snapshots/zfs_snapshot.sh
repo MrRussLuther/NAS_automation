@@ -7,7 +7,7 @@ NOW=$(date +%Y-%m-%d-%H-%M-%S)
 log() {
     local level=$1
     local message=$2
-    echo "$(date +%Y-%m-%d-%H-%M-%S) - ${level} - ${message}" >> ${LOGFILE}
+    echo "$(date +%Y-%m-%d-%H-%M-%S) - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
 }
 
 # Ensure dataset is provided as an argument
