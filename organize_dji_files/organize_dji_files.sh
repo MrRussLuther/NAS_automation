@@ -21,8 +21,8 @@ log() {
     local message=$2
     if [ "$level" = "ERROR" ]; then
         echo "$(date +%Y-%m-%d-%H-%M-%S) - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
-    else
-        echo "$(date +%Y-%m-%d-%H-%M-%S) - ${level} - ${message}" | tee -a ${LOG_FILE}
+    elif [ "$level" = "INFO" ]; then
+        echo "$timestamp - ${level} - ${message}" >> ${LOG_FILE}
     fi
 }
 
