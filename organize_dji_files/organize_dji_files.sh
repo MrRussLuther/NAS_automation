@@ -19,11 +19,11 @@ LOG_FILE="${SCRIPT_DIR}/organize_dji_files.log"
 log() {
     local level=$1
     local message=$2
-    local now=$(date +%Y-%m-%d-%H-%M-%S-%Z)
+    local timestamp=$(date +%Y-%m-%d-%H-%M-%S-%Z)
     if [ "$level" = "ERROR" ]; then
-        echo "$now - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
+        echo "$timestamp - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
     elif [ "$level" = "INFO" ]; then
-        echo "$now - ${level} - ${message}" >> ${LOG_FILE}
+        echo "$timestamp - ${level} - ${message}" >> ${LOG_FILE}
     fi
 }
 
