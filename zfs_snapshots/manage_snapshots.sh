@@ -33,7 +33,7 @@ chown "${PARENT_OWNER}" "${LOG_FILE}" "${LOCKFILE}"
 log() {
     local level=$1
     local message=$2
-    local timestamp=$(date +%Y-%m-%d-%H-%M-%S)
+    local timestamp=$(date +%Y-%m-%d-%H-%M-%S-%Z)
     if [ "$level" = "ERROR" ]; then
         echo "$timestamp - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
     elif [ "$level" = "INFO" ]; then
