@@ -3,9 +3,6 @@
 # Exit on error, undefined variable, or pipe failure
 set -euo pipefail
 
-# Get current date and time
-NOW=$(date +%Y-%m-%d-%H-%M-%S-%Z)
-
 # Specify the directory to output the files
 OUTPUT_DIR="/mnt/RussNAS/plex/plex-media/Library/Drone Videos"
 
@@ -22,10 +19,11 @@ LOG_FILE="${SCRIPT_DIR}/organize_dji_files.log"
 log() {
     local level=$1
     local message=$2
+    local now=$(date +%Y-%m-%d-%H-%M-%S-%Z)
     if [ "$level" = "ERROR" ]; then
-        echo "$NOW - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
+        echo "$now - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
     elif [ "$level" = "INFO" ]; then
-        echo "$NOW - ${level} - ${message}" >> ${LOG_FILE}
+        echo "$now - ${level} - ${message}" >> ${LOG_FILE}
     fi
 }
 
