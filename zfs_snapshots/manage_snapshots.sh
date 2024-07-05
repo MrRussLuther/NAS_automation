@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get current date and time
-NOW=$(date +%Y-%m-%d-%H-%M-%S)
+NOW=$(date +%Y-%m-%d-%H-%M-%S-%Z)
 
 # Ensure dataset is provided as an argument
 if [ -z "$1" ]; then

@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Get current date and time
-NOW=$(date +%Y-%m-%d-%H-%M-%S)
+NOW=$(date +%Y-%m-%d-%H-%M-%S-%Z)
 
 # Specify the directory to output the files
 OUTPUT_DIR="/mnt/RussNAS/plex/plex-media/Library/Drone Videos"
