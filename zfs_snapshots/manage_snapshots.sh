@@ -67,7 +67,7 @@ cleanup_snapshots() {
     count=$(echo "$snapshots" | grep -c "${dataset}@.*-${tag}")
     
     # Log the number of snapshots before cleanup if count is greater than 1
-    if [ "$count" -gt 1 ]; then 
+    if [ "$count" -ge 1 ]; then 
         log "INFO" "Found $count ${tag} snapshots for ${dataset}"
     fi
 
