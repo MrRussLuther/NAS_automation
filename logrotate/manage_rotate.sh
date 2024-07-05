@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Rotate test log file
-logrotate /mnt/RussNAS/scripts/logrotate/rotate_test.conf
-
 # Rotate WindowsComputer log file
 logrotate /mnt/RussNAS/scripts/logrotate/rotate_WindowsComputer.conf
 

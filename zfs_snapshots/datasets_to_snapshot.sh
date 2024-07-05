@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Snapshot test dataset
-bash /mnt/RussNAS/scripts/zfs_snapshots/manage_snapshots.sh RussNAS/test
-
 # Sanpshot WindowsComputer dataset
 bash /mnt/RussNAS/scripts/zfs_snapshots/manage_snapshots.sh RussNAS/WindowsComputer
 
