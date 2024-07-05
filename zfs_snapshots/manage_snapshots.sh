@@ -66,8 +66,10 @@ cleanup_snapshots() {
     # Count snapshots
     count=$(echo "$snapshots" | grep -c "${dataset}@.*-${tag}")
     
-    # Log the number of snapshots before cleanup
-    log "INFO" "Found $count ${tag} snapshots for ${dataset}"
+    # Log the number of snapshots before cleanup if count is greater than 1
+    if [ "$count" -gt 1 ]; then 
+        log "INFO" "Found $count ${tag} snapshots for ${dataset}"
+    fi
 
     # Remove old snapshots if more than the 'keep' count
     if [ "$count" -gt "$keep" ]; then
@@ -96,9 +98,6 @@ fi
 trap 'rm -f "${LOCKFILE}"; exit' INT TERM EXIT
 echo $$ > "${LOCKFILE}"
 
-# Flag to indicate if a higher priority snapshot is taken
-snapshot_taken=false
-
 # Parse the captured date and time into individual components
 current_hour=$(echo $NOW | cut -d'-' -f4)
 current_minute=$(echo $NOW | cut -d'-' -f5)
@@ -110,31 +109,24 @@ current_month=$(echo $NOW | cut -d'-' -f2)
 # Daily Snapshots: Tag daily snapshot at midnight
 if [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
     create_snapshot "daily"
-    snapshot_taken=true
 fi
 
 # Weekly Snapshots: Tag weekly snapshot at midnight on Sunday
 if [ "$current_weekday" -eq 7 ] && [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
     create_snapshot "weekly"
-    snapshot_taken=true
 fi
 
 # Monthly Snapshots: Tag monthly snapshot at midnight on the 1st
 if [ "$current_day" -eq 1 ] && [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
     create_snapshot "monthly"
-    snapshot_taken=true
 fi
 
 # Yearly Snapshots: Tag yearly snapshot at midnight on January 1st
 if [ "$current_month" -eq 1 ] && [ "$current_day" -eq 1 ] && [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
     create_snapshot "yearly"
-    snapshot_taken=true
 fi
 
-# Create a hourly snapshot every time the script runs if no other snapshot is taken
-if [ "$snapshot_taken" = false ]; then
-    create_snapshot "hourly"
-fi
+create_snapshot "hourly"
 
 # Hourly Snapshots: Keep hourly snapshots for 1 day
 cleanup_snapshots "${DATASET}" "hourly" 24
