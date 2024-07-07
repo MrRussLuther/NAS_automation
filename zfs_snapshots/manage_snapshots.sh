@@ -138,7 +138,7 @@ handle_snapshot_policy() {
             cleanup_all_snapshots
 
         else
-            log "ERROR" "Snapshot script was run off of expected schedule"
+            log "ERROR" "Snapshot script was run off of expected schedule for ${DATASET}"
         fi
 
     fi
