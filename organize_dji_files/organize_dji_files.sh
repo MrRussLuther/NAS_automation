@@ -27,6 +27,8 @@ log() {
     # Log to stderr if the level is ERROR
     if [ "$level" = "ERROR" ]; then
         echo "$timestamp - ${level} - ${message}" >&2
+    elif [ -t 1 ]; then
+        echo "$timestamp - ${level} - ${message}"
     fi
 }
 
