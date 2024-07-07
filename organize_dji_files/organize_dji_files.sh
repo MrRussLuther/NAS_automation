@@ -20,10 +20,13 @@ log() {
     local level=$1
     local message=$2
     local timestamp=$(date +%Y-%m-%d-%H-%M-%S-%Z)
+    
+    # Log to the logfile
+    echo "$timestamp - ${level} - ${message}" >> "${LOG_FILE}"
+    
+    # Log to stderr if the level is ERROR
     if [ "$level" = "ERROR" ]; then
-        echo "$timestamp - ${level} - ${message}" | tee -a ${LOG_FILE} >&2
-    elif [ "$level" = "INFO" ]; then
-        echo "$timestamp - ${level} - ${message}" >> ${LOG_FILE}
+        echo "$timestamp - ${level} - ${message}" >&2
     fi
 }
 
