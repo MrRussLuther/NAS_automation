@@ -50,9 +50,9 @@ create_snapshot() {
     local dataset=$1
     local tag=$2
     if zfs snapshot "${dataset}@${NOW}-${tag}"; then
-        log "INFO" "Created snapshot ${dataset}@${NOW}-${tag}"
+        log "INFO" "Snapshot created: ${dataset}@${NOW}-${tag}"
     else
-        log "ERROR" "Failed to create snapshot ${dataset}@${NOW}-${tag}"
+        log "ERROR" "Failed to create snapshot: ${dataset}@${NOW}-${tag}"
     fi
 }
 
@@ -66,17 +66,17 @@ cleanup_snapshots() {
     count=$(echo "$snapshots" | grep -c "${dataset}@.*-${tag}")
 
     if [ "$count" -ge 1 ]; then 
-        log "INFO" "Found $count ${tag} snapshots for ${dataset}"
+        log "INFO" "$count ${tag} snapshots found for ${dataset}"
     fi
 
     if [ "$count" -gt "$keep" ]; then
         to_delete=$(echo "$snapshots" | head -n -"$keep")
         if echo "$to_delete" | xargs -n 1 zfs destroy; then
-            log "INFO" "Deleted $(echo "$to_delete" | wc -l) old ${tag} snapshots for ${dataset}"
-            log "INFO" "Snapshot Names: $(echo "$to_delete" | tr '\n' ' ')"
+            log "INFO" "$(echo "$to_delete" | wc -l) old ${tag} snapshots deleted for ${dataset}"
+            log "INFO" "Deleted snapshots: $(echo "$to_delete" | tr '\n' ' ')"
         else
             log "ERROR" "Failed to delete some ${tag} snapshots for ${dataset}"
-            log "ERROR" "Snapshot Names: $(echo "$to_delete" | tr '\n' ' ')"
+            log "ERROR" "Snapshots to delete: $(echo "$to_delete" | tr '\n' ' ')"
         fi
     fi
 }
@@ -95,7 +95,7 @@ ensure_single_instance() {
     if [ -e "${LOCKFILE}" ]; then
         LOCK_PID=$(cat "${LOCKFILE}")
         if [ -n "$LOCK_PID" ] && kill -0 "$LOCK_PID" 2>/dev/null; then
-            log "ERROR" "Script is already running"
+            log "ERROR" "Script is already running. PID: $LOCK_PID"
             exit 1
         fi
     fi
@@ -147,31 +147,31 @@ handle_snapshot_policy() {
     if [ "$snapshot_taken" = true ]; then
         cleanup_all_snapshots
     else
-        log "ERROR" "Snapshot script was run off of expected schedule for ${DATASET}"
+        log "ERROR" "Snapshot script ran outside the expected schedule for ${DATASET}"
     fi
 
 }
 
 # Function to prompt user for manual snapshot and cleanup
 interactive_prompt() {
-    log "INFO" "Script was run interactively. Prompting the user to take a manual snapshot"
+    log "INFO" "Script ran interactively. Prompting user for manual snapshot."
     echo "Would you like to take a manual snapshot now? The snapshot name will be: \"${DATASET}@${NOW}-manual\""
     read -p "(yes/no) " snapshot_response
     if [ "$snapshot_response" = "yes" ]; then
-        log "INFO" "User chose to take a manual snapshot"
+        log "INFO" "User opted to take a manual snapshot."
         create_snapshot "${DATASET}" "manual"
     else
-        log "INFO" "User chose not to take a manual snapshot"
+        log "INFO" "User declined to take a manual snapshot."
     fi
 
-    log "INFO" "Prompting the user to clean up snapshots"
+    log "INFO" "Prompting user for snapshot cleanup."
     echo "Would you like to clean up snapshots now?"
     read -p "(yes/no) " cleanup_response
     if [ "$cleanup_response" = "yes" ]; then
-        log "INFO" "User chose to clean up scheduled snapshots"
+        log "INFO" "User opted to clean up scheduled snapshots."
         cleanup_all_snapshots
     else
-        log "INFO" "User chose not to clean up scheduled snapshots"
+        log "INFO" "User declined to clean up scheduled snapshots."
     fi
 }
 
