@@ -116,32 +116,35 @@ parse_current_time() {
 
 # Function to handle snapshot creation based on time
 handle_snapshot_policy() {
-    if [ ! -t 1 ]; then
-        if [ "$current_minute" -eq 0 ]; then
-            create_snapshot "${DATASET}" "hourly"
-            cleanup_all_snapshots
-        
-        elif [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
-            create_snapshot "${DATASET}" "daily"
-            cleanup_all_snapshots
 
-        elif [ "$current_weekday" -eq 7 ] && [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
-            create_snapshot "${DATASET}" "weekly"
-            cleanup_all_snapshots
-
-        elif [ "$current_day" -eq 1 ] && [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
-            create_snapshot "${DATASET}" "monthly"
-            cleanup_all_snapshots
-
-        elif [ "$current_month" -eq 1 ] && [ "$current_day" -eq 1 ] && [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
-            create_snapshot "${DATASET}" "yearly"
-            cleanup_all_snapshots
-
-        else
-            log "ERROR" "Snapshot script was run off of expected schedule for ${DATASET}"
-        fi
-
+    snapshot_taken=false        
+    
+    if [ "$current_month" -eq 1 ] && [ "$current_day" -eq 1 ] && [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
+        create_snapshot "${DATASET}" "yearly"
+        snapshot_taken=true
+        cleanup_all_snapshots
+    elif [ "$current_day" -eq 1 ] && [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
+        create_snapshot "${DATASET}" "monthly"
+        snapshot_taken=true
+        cleanup_all_snapshots
+    elif [ "$current_weekday" -eq 7 ] && [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
+        create_snapshot "${DATASET}" "weekly"
+        snapshot_taken=true
+        cleanup_all_snapshots
+    elif [ "$current_hour" -eq 0 ] && [ "$current_minute" -eq 0 ]; then
+        create_snapshot "${DATASET}" "daily"
+        snapshot_taken=true
+        cleanup_all_snapshots
+    elif [ "$current_minute" -eq 0 ]; then
+        create_snapshot "${DATASET}" "hourly"
+        snapshot_taken=true
+        cleanup_all_snapshots
     fi
+    
+    if [ "$snapshot_taken" = false ]; then
+        log "ERROR" "Snapshot script was run off of expected schedule for ${DATASET}"
+    fi
+
 }
 
 # Function to prompt user for manual snapshot and cleanup
