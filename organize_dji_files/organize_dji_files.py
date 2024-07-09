@@ -77,6 +77,7 @@ def process_files():
 
 def main():
     # Ensure the directory exists
+    log("INFO", "Organizing files started")
     if not os.path.isdir(OUTPUT_DIR):
         log("ERROR", f"Directory {OUTPUT_DIR} does not exist. Exiting.")
         sys.exit(1)
