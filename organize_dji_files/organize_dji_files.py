@@ -3,7 +3,7 @@ import os
 import re
 import shutil
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Specify the directory to output the files
 OUTPUT_DIR = "/mnt/RussNAS/plex/plex-media/Library/Drone Videos"
@@ -18,7 +18,7 @@ LOG_FILE = os.path.join(SCRIPT_DIR, "organize_dji_files.log")
 
 # Function to log messages
 def log(level: str, message: str) -> None:
-    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%Z")
+    timestamp = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d-%H-%M-%S-%Z")
     log_message = f"{timestamp} - {level} - {message}"
     
     # Log to the logfile
