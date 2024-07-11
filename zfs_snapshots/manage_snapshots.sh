@@ -158,7 +158,7 @@ handle_snapshot_policy() {
         snapshot_taken=true
     fi
     
-    if [ "$snapshot_taken" = true ]; then
+    if [ "$snapshot_taken" = false ]; then
         log "ERROR" "Snapshot script ran outside the expected schedule for ${DATASET}"
     fi
     cleanup_all_snapshots
