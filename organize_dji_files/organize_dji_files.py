@@ -6,7 +6,7 @@ import sys
 from datetime import datetime, timezone
 
 # Specify the directory to output the files
-OUTPUT_DIR = "/mnt/RussNAS/plex/plex-media/Library/Drone Videos"
+OUTPUT_DIR = "/mnt/RussNAS/media/Library/Drone Videos"
 # Specify the directory containing the files to process
 FILES_DIR = os.path.join(OUTPUT_DIR, "To Process")
 
