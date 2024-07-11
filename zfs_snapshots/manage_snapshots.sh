@@ -159,11 +159,9 @@ handle_snapshot_policy() {
     fi
     
     if [ "$snapshot_taken" = true ]; then
-        cleanup_all_snapshots
-    else
         log "ERROR" "Snapshot script ran outside the expected schedule for ${DATASET}"
     fi
-
+    cleanup_all_snapshots
 }
 
 # Function to prompt user for manual snapshot and cleanup
