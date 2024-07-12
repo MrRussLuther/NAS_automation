@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get current date and time
-NOW=$(date +%Y-%m-%d_%H-%M-%S-%Z)
+NOW=$(date +%Y-%m-%d_%H-%M-%Z)
 
 # Ensure exactly one argument (dataset) is provided
 if [ $# -ne 1 ]; then
@@ -122,7 +122,6 @@ ensure_single_instance() {
 parse_current_time() {
     current_hour=$(echo $NOW | cut -d'_' -f2 | cut -d'-' -f1)
     current_minute=$(echo $NOW | cut -d'_' -f2 | cut -d'-' -f2)
-    current_second=$(echo $NOW | cut -d'_' -f2 | cut -d'-' -f3 | cut -d'-' -f1)
     current_day=$(echo $NOW | cut -d'_' -f1 | cut -d'-' -f3)
     current_weekday=$(date +%u)
     current_month=$(echo $NOW | cut -d'_' -f1 | cut -d'-' -f2)
