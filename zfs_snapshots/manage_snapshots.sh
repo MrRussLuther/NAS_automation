@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get current date and time
-NOW=$(date +%Y-%m-%d_%H-%M-%Z)
+NOW=$(date +%Y-%m-%d-%H-%M-%Z)
 
 # Ensure exactly one argument (dataset) is provided
 if [ $# -ne 1 ]; then
@@ -40,7 +40,7 @@ setup_environment() {
 log() {
     local level=$1
     local message=$2
-    local timestamp=$(date +%Y-%m-%d_%H-%M-%S-%Z)
+    local timestamp=$(date +%Y-%m-%d-%H-%M-%S-%Z)
 
     echo "$timestamp - ${level} - ${message}" >> "${LOG_FILE}"
 
@@ -55,10 +55,10 @@ log() {
 create_snapshot() {
     local dataset=$1
     local tag=$2
-    if zfs snapshot "${dataset}@${NOW}_${tag}"; then
-        log "INFO" "Snapshot created: ${dataset}@${NOW}_${tag}"
+    if zfs snapshot "${dataset}@${NOW}-${tag}"; then
+        log "INFO" "Snapshot created: ${dataset}@${NOW}-${tag}"
     else
-        log "ERROR" "Failed to create snapshot: ${dataset}@${NOW}_${tag}"
+        log "ERROR" "Failed to create snapshot: ${dataset}@${NOW}-${tag}"
     fi
 }
 
@@ -120,11 +120,11 @@ ensure_single_instance() {
 
 # Function to parse the captured date and time into individual components
 parse_current_time() {
-    current_hour=$(echo $NOW | cut -d'_' -f2 | cut -d'-' -f1)
-    current_minute=$(echo $NOW | cut -d'_' -f2 | cut -d'-' -f2)
-    current_day=$(echo $NOW | cut -d'_' -f1 | cut -d'-' -f3)
+    current_hour=$(echo $NOW | cut -d'-' -f4)
+    current_minute=$(echo $NOW | cut -d'-' -f5)
+    current_day=$(echo $NOW | cut -d'-' -f3)
     current_weekday=$(date +%u)
-    current_month=$(echo $NOW | cut -d'_' -f1 | cut -d'-' -f2)
+    current_month=$(echo $NOW | cut -d'-' -f2)
 }
 
 # Function to handle snapshot creation based on time
@@ -166,7 +166,7 @@ handle_snapshot_policy() {
 # Function to prompt user for manual snapshot and cleanup
 interactive_prompt() {
     log "INFO" "Script ran interactively. Prompting user for manual snapshot."
-    echo "Would you like to take a manual snapshot now? The snapshot name will be: \"${DATASET}@${NOW}_manual\""
+    echo "Would you like to take a manual snapshot now? The snapshot name will be: \"${DATASET}@${NOW}-manual\""
     read -p "(yes/no) " snapshot_response
     if [ "$snapshot_response" = "yes" ]; then
         log "INFO" "User opted to take a manual snapshot."
