@@ -26,11 +26,14 @@ def main():
             file_path = os.path.join(script_dir, file)  # Get the full path of the .conf file
             owner_uid, owner_gid, permissions = get_file_info(file_path)  # Retrieve current file info
             
-            set_file_info(file_path, 0, 0, '600')  # Change owner to root and permissions to 600
-            
-            subprocess.run(['logrotate', file_path], check=True)  # Run logrotate on the file
-            
-            set_file_info(file_path, owner_uid, owner_gid, permissions)  # Restore original file info
+            try:
+                set_file_info(file_path, 0, 0, '600')  # Change owner to root and permissions to 600
+                
+                subprocess.run(['logrotate', file_path], check=True)  # Run logrotate on the file
+            except subprocess.CalledProcessError:
+                print(f"Logrotate failed for {file_path}. Restoring original permissions and owners.")
+            finally:
+                set_file_info(file_path, owner_uid, owner_gid, permissions)  # Restore original file info
 
 if __name__ == "__main__":
     main()

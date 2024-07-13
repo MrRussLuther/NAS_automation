@@ -3,6 +3,7 @@ import os
 import re
 import shutil
 import sys
+import logging
 from datetime import datetime, timezone
 
 # Specify the directory to output the files
@@ -13,37 +14,29 @@ FILES_DIR = os.path.join(OUTPUT_DIR, "To Process")
 # Determine the script's directory
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Set the log file location in the script's directory
+# Set up the logger
 LOG_FILE = os.path.join(SCRIPT_DIR, "organize_dji_files.log")
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    datefmt='%Y-%m-%d-%H-%M-%S-%Z',
+                    handlers=[logging.FileHandler(LOG_FILE)])
 
-# Function to log messages
-def log(level: str, message: str) -> None:
-    timestamp = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d-%H-%M-%S-%Z")
-    log_message = f"{timestamp} - {level} - {message}"
-    
-    # Log to the logfile
-    with open(LOG_FILE, "a") as log_file:
-        log_file.write(log_message + "\n")
-    
-    # Log to stderr if the level is ERROR
-    if level == "ERROR":
-        print(log_message, file=sys.stderr)
-    elif sys.stdout.isatty():
-        print(log_message)
+# Add StreamHandler if script is run via terminal
+if sys.stdout.isatty():
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    logging.getLogger().addHandler(console_handler)
 
 def process_files():
     # List all entries in the directory
     all_entries = os.listdir(FILES_DIR)
     
     # Filter out only the files from the entries
-    files_to_process = []
-    for entry in all_entries:
-        entry_path = os.path.join(FILES_DIR, entry)
-        if os.path.isfile(entry_path):
-            files_to_process.append(entry)
+    files_to_process = [entry for entry in all_entries if os.path.isfile(os.path.join(FILES_DIR, entry))]
     
     if not files_to_process:
-        log("INFO", f"No files to process in {FILES_DIR}")
+        logging.info(f"No files to process in {FILES_DIR}")
     else:
         for file in files_to_process:
             file_path = os.path.join(FILES_DIR, file)
@@ -61,34 +54,34 @@ def process_files():
                 if not os.path.isdir(target_dir):
                     try:
                         os.makedirs(target_dir)
-                        log("INFO", f"Created directory {target_dir}")
+                        logging.info(f"Created directory {target_dir}")
                     except Exception as e:
-                        log("ERROR", f"Failed to create directory {target_dir}: {e}")
+                        logging.error(f"Failed to create directory {target_dir}: {e}")
                         continue
 
                 # Move the file to the appropriate directory, and log any errors
                 try:
                     shutil.move(file_path, target_dir)
-                    log("INFO", f"Moved {filename} to {target_dir}/")
+                    logging.info(f"Moved {filename} to {target_dir}/")
                 except Exception as e:
-                    log("ERROR", f"Failed to move {filename} to {target_dir}/: {e}")
+                    logging.error(f"Failed to move {filename} to {target_dir}/: {e}")
             else:
-                log("ERROR", f"Skipping {filename} - not in expected format")
+                logging.error(f"Skipping {filename} - not in expected format")
 
 def main():
     # Ensure the directory exists
-    log("INFO", "Organizing files started")
+    logging.info("Organizing files started")
     if not os.path.isdir(OUTPUT_DIR):
-        log("ERROR", f"Directory {OUTPUT_DIR} does not exist. Exiting.")
+        logging.error(f"Directory {OUTPUT_DIR} does not exist. Exiting.")
         sys.exit(1)
 
     # Ensure the directory exists
     if not os.path.isdir(FILES_DIR):
-        log("ERROR", f"Directory {FILES_DIR} does not exist. Exiting.")
+        logging.error(f"Directory {FILES_DIR} does not exist. Exiting.")
         sys.exit(1)
 
     process_files()
-    log("INFO", "Organizing files complete")
+    logging.info("Organizing files complete")
 
 if __name__ == "__main__":
     main()
