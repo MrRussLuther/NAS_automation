@@ -7,7 +7,7 @@ import logging
 from datetime import datetime, timezone
 
 # Specify the directory to output the files
-OUTPUT_DIR = "/mnt/RussNAS/media/Drone Videos"
+OUTPUT_DIR = "/mnt/russnas/media/Drone Videos"
 # Specify the directory containing the files to process
 FILES_DIR = os.path.join(OUTPUT_DIR, "To Process")
 
