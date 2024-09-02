@@ -91,8 +91,8 @@ cleanup_snapshots() {
 # Function to handle cleanup of snapshots
 cleanup_all_snapshots() {
     cleanup_occurred=false
-    cleanup_snapshots "${DATASET}" "hourly" 24
-    cleanup_snapshots "${DATASET}" "daily" 14
+    cleanup_snapshots "${DATASET}" "hourly" 168
+    cleanup_snapshots "${DATASET}" "daily" 31
     cleanup_snapshots "${DATASET}" "weekly" 12
     cleanup_snapshots "${DATASET}" "monthly" 12
     cleanup_snapshots "${DATASET}" "yearly" 5
