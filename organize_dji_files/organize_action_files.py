@@ -7,7 +7,7 @@ import logging
 from datetime import datetime, timezone
 
 # Specify the directory to output the files
-OUTPUT_DIR = "/mnt/russnas/media/Drone Videos"
+OUTPUT_DIR = "/mnt/russnas/media/Action Footage"
 # Specify the directory containing the files to process
 FILES_DIR = os.path.join(OUTPUT_DIR, "To Process")
 
@@ -15,7 +15,7 @@ FILES_DIR = os.path.join(OUTPUT_DIR, "To Process")
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Set up the logger
-LOG_FILE = os.path.join(SCRIPT_DIR, "organize_dji_files.log")
+LOG_FILE = os.path.join(SCRIPT_DIR, "organize_action_files.log")
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s',
                     datefmt='%Y-%m-%d-%H-%M-%S-%Z',
@@ -42,22 +42,33 @@ def process_files():
             file_path = os.path.join(FILES_DIR, file)
             filename = os.path.basename(file_path)
 
-            match = re.match(r"DJI_(\d{8})(\d{6})_(\d{4})_D\.MP4", filename)
-            if match:
-                year = match.group(1)[:4]
-                month = match.group(1)[4:6]
-                day = match.group(1)[6:8]
+            vid_match = re.match(r"DJI_(\d{8})(\d{6})_(\d{4})_D\.MP4", filename)
+            pic_match = re.match(r"DJI_(\d{8})(\d{6})_(\d{4})_D_.*\.JPG", filename)
+            if vid_match:
+                files_to_move = True
+                year = vid_match.group(1)[:4]
+                month = vid_match.group(1)[4:6]
+                day = vid_match.group(1)[6:8]
 
-                target_dir = os.path.join(OUTPUT_DIR, year, month, day)
+                target_dir = os.path.join(OUTPUT_DIR, "media", "video", year, month, day)
+
+            elif pic_match:
+                files_to_move = True
+                year = pic_match.group(1)[:4]
+                month = pic_match.group(1)[4:6]
+                day = pic_match.group(1)[6:8]
+                is_seq_shot =  re.match(r"DJI_(\d{8})(\d{6})_(\d{4})_D_(\d{3})\.JPG", filename)
                 
-                # Create directory structure if it doesn't exist, and log any errors
-                if not os.path.isdir(target_dir):
-                    try:
-                        os.makedirs(target_dir)
-                        logging.info(f"Created directory {target_dir}")
-                    except Exception as e:
-                        logging.error(f"Failed to create directory {target_dir}: {e}")
-                        continue
+                if is_seq_shot:
+                    target_dir = os.path.join(OUTPUT_DIR, "media", "picture", year, month, day, is_seq_shot.group(3))
+                else:
+                    target_dir = os.path.join(OUTPUT_DIR, "media", "picture", year, month, day)
+
+            else:
+                logging.error(f"Skipping {filename} - not in expected format")
+
+            if files_to_move:
+                create_directory(target_dir)
 
                 # Move the file to the appropriate directory, and log any errors
                 try:
@@ -66,7 +77,18 @@ def process_files():
                 except Exception as e:
                     logging.error(f"Failed to move {filename} to {target_dir}/: {e}")
             else:
-                logging.error(f"Skipping {filename} - not in expected format")
+                logging.info("Had an issue constructing target_dir. This is a weird one.")
+                logging.info(f"Target_dir: {target_dir}\tFilename: {filename}")
+
+def create_directory(target_dir):
+    if not os.path.isdir(target_dir):
+        try:
+            os.makedirs(target_dir)
+            logging.info(f"Created directory {target_dir}")
+        except Exception as e:
+            logging.error(f"Failed to create directory {target_dir}: {e}")
+            return False
+    return True
 
 def main():
     # Ensure the directory exists
